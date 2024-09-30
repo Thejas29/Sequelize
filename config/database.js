@@ -1,6 +1,5 @@
 const { Sequelize }= require('sequelize');
 
-
 //connecting to database
 const sequelize=new Sequelize('newdb','root','',{
     host: 'localhost',

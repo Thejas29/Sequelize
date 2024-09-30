@@ -4,7 +4,7 @@ const User=require('../models/user');
 const createUser=async(req,res)=>{
     try{
         const user= await User.create({
-            username: req.body.username,
+            name: req.body.name,
             email: req.body.email
         });
         res.status(201).json(user);
@@ -40,9 +40,9 @@ const getUsers = async (req, res) => {
 const updateUser=async (req,res)=>{
     try{
         const { id }= req.params;
-        const {username, email}=req.body;
+        const {name, email}=req.body;
         const [updated]=await User.update(
-            {username,email},
+            {name,email},
             {where: {id}}
         );
         if(updated===0){
@@ -55,19 +55,23 @@ const updateUser=async (req,res)=>{
 };
 
 //delete user
-const deleteUser=async (req,res)=>{
-    try{
-        const {id}=req.params;
-        const deleted=await User.destroy({
-            where: {id}
-        });
-        if(deleted===0){
-            res.status(404).json({message: 'User not found'});
+const deleteUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await User.findByPk(id);
+        
+        if (!user) {
+            return res.status(404).json({ error: "User not found" }); // Respond if user is not found
         }
-        res.status(200).json({message: 'User deleted'});
-    }catch(error){
-        res.status(500).json({error: error.message});
+        
+        await user.destroy(); // Delete the user
+        
+        return res.status(200).json({ message: "User deleted successfully" }); // Success response
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        return res.status(500).json({ error: "An error occurred while deleting the user" }); // Error response
     }
 };
+
 
 module.exports={createUser,getUsers,updateUser,deleteUser};
